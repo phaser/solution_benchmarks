@@ -5,27 +5,38 @@
 using namespace std;
 class Solution {
 public:
-    vector<string> generateParenthesis(int n) {
-        queue<string> toexpand;
-        unordered_set<string> unique;
-        toexpand.push("()");
-        unique.emplace("()");
-        for (int i = 1; i < n; i++) {
-            unique.clear();
-            int cnt = 2*i;
-            while ((toexpand.front()).length() == cnt) {
-                string cur = toexpand.front();
-                for (int j = 0; j < 2*i; j++) {
-                    string ns = cur.substr(0, j) + "()" + cur.substr(j);
-                    if (unique.find(ns) == unique.end()) {
-                        unique.emplace(ns);
-                        toexpand.push(ns);
-                    }
-                }
-                toexpand.pop();
-            }
+    string solution_to_string(int* sol, int n) {
+        string result;
+        result.reserve(2*n);
+        int j = 0;
+        for (int i = 0; i < 2*n; i++) {
+            result.push_back((j < n && i == sol[j] ? '(' : ')'));
+            j += (j < n && i == sol[j]) ? 1 : 0;
         }
-        vector<string> result(unique.begin(), unique.end());
+        return result;
+    }
+    
+    vector<string> generateParenthesis(int n) {
+        int sol[128];
+        vector<string> result;
+        for (int i = 0; i < n; i++) {
+            sol[i] = i;
+        }
+        bool solPossible = true;
+        while (solPossible) {
+            result.push_back(solution_to_string(sol, n));
+            int ce = n - 1;
+            sol[ce]++;
+            while (ce >= 0 && sol[ce] > (2 * ce)) {
+                ce--;
+                if (ce >= 0) sol[ce]++;
+                else {
+                    solPossible = false;
+                    break;
+                }
+            }
+            while (++ce < n && ce > 0) { sol[ce] = sol[ce - 1] + 1; }
+        }
         return result;
     }
 };
